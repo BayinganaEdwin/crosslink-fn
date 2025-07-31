@@ -1,9 +1,23 @@
-export const currentUser = {
+import { USER_DATA } from '../constants';
+
+export const getLoggedInUser = () => {
+  if (typeof window !== 'undefined') {
+    const userData = localStorage.getItem(USER_DATA);
+    if (userData) {
+      return JSON.parse(userData);
+    }
+  }
+  return null;
+};
+
+const loggedInUser = getLoggedInUser();
+
+export const currentUser = loggedInUser || {
   id: 'stu_001',
-  name: 'Aline Uwase',
-  email: 'aline@student.university.rw',
+  name: 'User',
+  email: 'user@example.com',
   avatar: '',
-  role: 'school' as 'student' | 'employer' | 'school',
+  role: 'student' as 'student' | 'employer' | 'school',
 };
 
 export const studentGoals = [

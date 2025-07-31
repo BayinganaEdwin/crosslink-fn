@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import { redirect } from 'next/navigation';
 import { UserRole } from '@/utils/types/types';
+import { TOKEN_NAME, USER_DATA } from '@/utils/constants';
 
 export function NavUser({
   user,
@@ -30,6 +31,8 @@ export function NavUser({
   };
 }) {
   const handleLogout = () => {
+    localStorage.removeItem(USER_DATA);
+    localStorage.removeItem(TOKEN_NAME);
     redirect('/login');
   };
 

@@ -145,7 +145,7 @@ export default function Page() {
                     type={showPassword ? 'text' : 'password'}
                     required
                     placeholder="********"
-                    defaultValue="password"
+                    defaultValue="Password@123"
                     className={errors.password ? 'border-destructive' : ''}
                   />
                   <button

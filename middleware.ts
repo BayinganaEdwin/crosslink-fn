@@ -20,7 +20,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   };
 
-  const protectedRoutes = ['/saved', '/product', '/stores'];
+  const protectedRoutes = ['/students'];
   const authRoutes = [routes.login.url, routes.signup.url];
 
   if (protectedRoutes.some((path) => req.nextUrl.pathname.startsWith(path))) {
@@ -29,7 +29,7 @@ export function middleware(req: NextRequest) {
 
   if (authRoutes.includes(req.nextUrl.pathname)) {
     return isTokenValid
-      ? NextResponse.redirect(new URL(routes.home.url, req.url))
+      ? NextResponse.redirect(new URL(routes.dashboard.url, req.url))
       : allowAccess();
   }
 
