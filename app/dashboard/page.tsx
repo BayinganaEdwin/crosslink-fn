@@ -6,7 +6,6 @@ import EmployerDashboard from './EmployerDashboard';
 import SchoolDashboard from './SchoolDashboard';
 
 export default function Page() {
-  console.log('currentUser?.role', currentUser.role);
   return (
     <SidebarProvider
       style={
