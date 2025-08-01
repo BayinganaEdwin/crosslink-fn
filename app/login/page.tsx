@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, Loader } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +15,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { redirect } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { useLoginMutation } from '@/store/actions/auth';
+import { setToken } from '@/store/reducers/app';
+import { TOKEN_NAME, USER_DATA } from '@/utils/constants';
+import toast, { LoaderIcon } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -23,6 +29,9 @@ export default function Page() {
     email?: string;
     password?: string;
   }>({});
+  const [login, { isLoading }] = useLoginMutation();
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   const handleSignupRedirect = () => {
     redirect('/signup');
@@ -45,7 +54,7 @@ export default function Page() {
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const formErrors = validateForm(formData);
@@ -56,8 +65,32 @@ export default function Page() {
     }
 
     setErrors({});
-    // console.log("Form is valid", Object.fromEntries(formData))
-    redirect('/dashboard');
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    const payload = {
+      email,
+      password,
+    };
+
+    try {
+      const res = await login(payload).unwrap();
+      const { user, token } = res;
+
+      dispatch(setToken(token));
+      // Sets the cookie to expire in 7 days
+      document.cookie = `${TOKEN_NAME}=${token}; path=/; max-age=${
+        60 * 60 * 24 * 7
+      }`;
+      localStorage.setItem(TOKEN_NAME, token);
+      localStorage.setItem(USER_DATA, JSON.stringify(user));
+      toast.success('Login successful!', {
+        id: 'global_success_msg',
+      });
+      router.push('/dashboard');
+    } catch (error) {
+      return;
+    }
   };
 
   return (
@@ -77,8 +110,8 @@ export default function Page() {
                   id="email"
                   type="email"
                   name="email"
-                  placeholder="m@example.com"
-                  defaultValue="m@example.com"
+                  placeholder="name@example.com"
+                  defaultValue="edwin@example.com"
                   required
                   className={errors.email ? 'border-destructive' : ''}
                 />
@@ -99,7 +132,7 @@ export default function Page() {
                     type={showPassword ? 'text' : 'password'}
                     required
                     placeholder="********"
-                    defaultValue="password"
+                    defaultValue="Password@123"
                     className={errors.password ? 'border-destructive' : ''}
                   />
                   <button
@@ -124,8 +157,13 @@ export default function Page() {
           </form>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full" form="login-form">
-            Login
+          <Button
+            type="submit"
+            className="w-full"
+            form="login-form"
+            disabled={isLoading}
+          >
+            {isLoading ? <LoaderIcon /> : 'Login'}
           </Button>
           <CardAction
             onClick={handleSignupRedirect}

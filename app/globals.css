@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -51,7 +51,7 @@
   --card-foreground: oklch(0.147 0.004 49.25);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.147 0.004 49.25);
-  --primary: oklch(0.216 0.006 56.043);
+  --primary: oklch(59.424% 0.14526 49.057);
   --primary-foreground: oklch(0.985 0.001 106.423);
   --secondary: oklch(0.97 0.001 106.424);
   --secondary-foreground: oklch(0.216 0.006 56.043);
@@ -85,7 +85,7 @@
   --card-foreground: oklch(0.985 0.001 106.423);
   --popover: oklch(0.216 0.006 56.043);
   --popover-foreground: oklch(0.985 0.001 106.423);
-  --primary: oklch(0.923 0.003 48.717);
+  --primary: oklch(0.575 0.17 217.15);
   --primary-foreground: oklch(0.216 0.006 56.043);
   --secondary: oklch(0.268 0.007 34.298);
   --secondary-foreground: oklch(0.985 0.001 106.423);
@@ -139,12 +139,12 @@ body {
     --spacing: 0.222222rem;
   }
 
-  [data-slot="card"] {
+  [data-slot='card'] {
     --spacing: 0.16rem;
   }
 
-  [data-slot="select-trigger"],
-  [data-slot="toggle-group-item"] {
+  [data-slot='select-trigger'],
+  [data-slot='toggle-group-item'] {
     --spacing: 0.222222rem;
   }
 }
@@ -221,8 +221,8 @@ body {
     @apply !shadow-none;
   }
 
-  [data-slot="toggle-group"],
-  [data-slot="toggle-group-item"] {
+  [data-slot='toggle-group'],
+  [data-slot='toggle-group-item'] {
     @apply !rounded-none !shadow-none;
   }
 }

@@ -8,45 +8,43 @@ import {
   IconUsers,
   IconTargetArrow,
   IconReportAnalytics,
-  IconCheck,
-  IconMessage,
-  IconClock12,
+  IconEdit,
+  IconMessageCircle,
+  IconCalendarEvent,
 } from '@tabler/icons-react';
+import {
+  useGetDashboardActivitiesQuery,
+  useGetDashboardStatsQuery,
+} from '@/store/actions/school';
+import { JSX } from 'react';
 
-const feedbackItems = [
-  {
-    icon: <IconCheck className="text-blue-600 size-4" />,
-    label: `Employer reviewed John Mukasa's goals`,
-    timestamp: '2 hours ago',
-  },
-  {
-    icon: <IconMessage className="text-green-600 size-4" />,
-    label: `New comment on Aline Uwase's reflection`,
-    timestamp: '4 hours ago',
-  },
-  {
-    icon: <IconClock12 className="text-purple-600 size-4" />,
-    label: 'Weekly update submitted by Sarah Imanzi',
-    timestamp: '1 day ago',
-  },
-];
+const iconMap: Record<string, JSX.Element> = {
+  'Goal Completed': <IconTargetArrow className="size-4 text-primary" />,
+  'New Goal': <IconEdit className="size-4 text-blue-500" />,
+  Comment: <IconMessageCircle className="size-4 text-green-600" />,
+  Reflection: <IconCalendarEvent className="size-4 text-purple-600" />,
+};
 
-export function RecentFeedbackCard() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const RecentFeedbackCard = ({ data }) => {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Recent Goal Activity</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {feedbackItems.map((item, index) => (
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {data?.map((item: any, index: number) => (
           <div key={index} className="flex items-start gap-3">
             <div className="flex items-center justify-center bg-muted rounded-full p-2">
-              {item.icon}
+              {iconMap[item.type] ?? (
+                <IconEdit className="size-4 text-muted-foreground" />
+              )}
             </div>
             <div className="flex flex-col text-sm">
-              <span className="font-medium">{item.label}</span>
+              <span className="font-medium">{item.message}</span>
               <span className="text-xs text-muted-foreground">
-                {item.timestamp}
+                {new Date(item.time).toLocaleString()}
               </span>
             </div>
           </div>
@@ -54,23 +52,25 @@ export function RecentFeedbackCard() {
       </CardContent>
     </Card>
   );
-}
+};
 
 export default function SchoolDashboard() {
+  const { data: dashboardStats } = useGetDashboardStatsQuery();
+  const { data: dashboardActivities } = useGetDashboardActivitiesQuery();
   const stats = [
     {
       title: 'Students Placed',
-      value: '42',
+      value: String(dashboardStats?.studentsPlaced || 0),
       icon: <IconUsers className="size-5 text-muted-foreground" />,
     },
     {
       title: 'Goals Completed',
-      value: '78%',
+      value: `${dashboardStats?.goalsCompletedPercentage || 0}%`,
       icon: <IconTargetArrow className="size-5 text-muted-foreground" />,
     },
     {
       title: 'Pending Feedback',
-      value: '12',
+      value: String(dashboardStats?.pendingFeedback || 0),
       icon: <IconReportAnalytics className="size-5 text-muted-foreground" />,
     },
   ];
@@ -97,7 +97,7 @@ export default function SchoolDashboard() {
 
         <Separator className="my-4" />
 
-        <RecentFeedbackCard />
+        <RecentFeedbackCard data={dashboardActivities} />
       </div>
     </SidebarInset>
   );

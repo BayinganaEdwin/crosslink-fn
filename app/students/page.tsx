@@ -4,11 +4,12 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarInset } from '@/components/ui/sidebar';
-import { currentUser } from '@/utils/data/student';
 import { EmployerGoalsTable } from './EmployerGoalsTable';
 import SchoolStudentsPage from './SchoolStudentsList';
+import { useLoggedInUser } from '@/hooks/useLoggedInUser';
 
 export default function EmployerGoalsPage() {
+  const { user: currentUser } = useLoggedInUser();
   return (
     <SidebarProvider
       style={
@@ -22,8 +23,8 @@ export default function EmployerGoalsPage() {
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col p-6">
-          {currentUser.role === 'employer' && <EmployerGoalsTable />}
-          {currentUser.role === 'school' && <SchoolStudentsPage />}
+          {currentUser?.role === 'employer' && <EmployerGoalsTable />}
+          {currentUser?.role === 'school' && <SchoolStudentsPage />}
         </div>
       </SidebarInset>
     </SidebarProvider>

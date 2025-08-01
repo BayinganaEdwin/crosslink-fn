@@ -15,8 +15,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { UserRole } from '@/utils/types/types';
+import { TOKEN_NAME, USER_DATA } from '@/utils/constants';
 
 export function NavUser({
   user,
@@ -29,8 +30,19 @@ export function NavUser({
     role: UserRole;
   };
 }) {
-  const handleLogout = () => {
-    redirect('/login');
+  const router = useRouter();
+  if (!user) return;
+
+  const handleLogout = async () => {
+    // Redirect to the login page first
+    router.push('/login');
+
+    // Clear data from local storage
+    localStorage.removeItem(USER_DATA);
+    localStorage.removeItem(TOKEN_NAME);
+
+    // Clear the token from cookies by setting its expiration date to the past
+    document.cookie = `${TOKEN_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
   };
 
   const avatarFallback = user.name

@@ -13,14 +13,13 @@ import {
 } from '@/components/ui/sidebar';
 import { sidebarDataByRole } from '@/utils/data/sidebar';
 import { usePathname } from 'next/navigation';
-
-import { currentUser } from '@/utils/data/student'; // should be dynamic
-
-const sidebarConfig = sidebarDataByRole[currentUser.role];
+import { useLoggedInUser } from '@/hooks/useLoggedInUser';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { role } = useLoggedInUser();
+  const sidebarConfig = sidebarDataByRole[role];
+
   const pathname = usePathname();
-  const role = currentUser.role;
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -45,7 +44,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent className="mt-4">
         <NavMain
-          items={sidebarConfig.navMain.map((item) => ({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          items={sidebarConfig?.navMain.map((item: any) => ({
             ...item,
             isActive: pathname === item.url,
           }))}

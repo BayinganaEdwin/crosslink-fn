@@ -1,5 +1,36 @@
+import { GenericResponse } from './global';
+
 // User Roles
 export type UserRole = 'student' | 'employer' | 'school';
+
+export type LoginResponse = GenericResponse<{
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: UserRole;
+  };
+  token: string;
+}>;
+export type SignupResponse = GenericResponse<{
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: UserRole;
+  };
+}>;
+
+export type LoginPayload = {
+  email: string;
+  password: string;
+};
+
+export type SignupPayload = {
+  name: string;
+  email: string;
+  password: string;
+};
 
 // Base User
 export interface User {

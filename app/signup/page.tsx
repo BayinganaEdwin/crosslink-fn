@@ -11,9 +11,11 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { redirect } from 'next/navigation';
 import { useState } from 'react';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { useSignupMutation } from '@/store/actions/auth';
+import toast, { LoaderIcon } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +23,8 @@ export default function Page() {
   const togglePassword = () => setShowPassword(!showPassword);
   const toggleConfirmPassword = () =>
     setShowConfirmPassword(!showConfirmPassword);
+  const [signup, { isLoading }] = useSignupMutation();
+  const router = useRouter();
 
   const [errors, setErrors] = useState<{
     name?: string;
@@ -30,7 +34,7 @@ export default function Page() {
   }>({});
 
   const handleLoginRedirect = () => {
-    redirect('/login');
+    router.push('/login');
   };
 
   const validateForm = (formData: FormData) => {
@@ -60,7 +64,7 @@ export default function Page() {
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const formErrors = validateForm(formData);
@@ -71,7 +75,28 @@ export default function Page() {
     }
 
     setErrors({});
-    console.log('Form is valid', Object.fromEntries(formData));
+
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const role = formData.get('role') as string;
+
+    const payload = {
+      name,
+      email,
+      password,
+      role,
+    };
+
+    try {
+      await signup(payload).unwrap();
+      toast.success('Signup successful!', {
+        id: 'global_success_msg',
+      });
+      router.push('/login');
+    } catch (error) {
+      return;
+    }
   };
 
   return (
@@ -209,8 +234,13 @@ export default function Page() {
           <Button variant="link">Already have an account? Log in</Button>
         </CardAction>
         <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full" form="signup-form">
-            Create account
+          <Button
+            type="submit"
+            className="w-full"
+            form="signup-form"
+            disabled={isLoading}
+          >
+            {isLoading ? <LoaderIcon /> : 'Create account'}
           </Button>
         </CardFooter>
       </Card>
