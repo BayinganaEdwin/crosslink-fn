@@ -26,27 +26,28 @@ export function NavMain({
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {items.map((item) => {
-            const isActive = item.url.endsWith(pathname);
+          {items &&
+            items?.map((item) => {
+              const isActive = item.url.endsWith(pathname);
 
-            return (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton
-                  tooltip={item.title}
-                  asChild
-                  className={cn(
-                    isActive &&
-                      'bg-neutral-200 dark:bg-muted font-semibold text-primary',
-                  )}
-                >
-                  <a href={item.url} className="flex items-center gap-2">
-                    {item.icon && <item.icon className="size-4" />}
-                    <span>{item.title}</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            );
-          })}
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    asChild
+                    className={cn(
+                      isActive &&
+                        'bg-neutral-200 dark:bg-muted font-semibold text-primary',
+                    )}
+                  >
+                    <a href={item.url} className="flex items-center gap-2">
+                      {item.icon && <item.icon className="size-4" />}
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

@@ -81,29 +81,3 @@ export const sampleGoals = [
     created_at: '2025-01-01T00:00:00Z',
   },
 ];
-
-// const studentReflections = [
-//   {
-//     id: 'ref_001',
-//     student_id: 'stu_001',
-//     week_number: 1,
-//     content:
-//       'I set up my local dev environment and read company documentation.',
-//     created_at: '2025-06-08',
-//   },
-//   {
-//     id: 'ref_002',
-//     student_id: 'stu_001',
-//     week_number: 2,
-//     content:
-//       'Worked on implementing login UI. Learned how to use component props.',
-//     created_at: '2025-06-15',
-//   },
-//   {
-//     id: 'ref_003',
-//     student_id: 'stu_001',
-//     week_number: 3,
-//     content: 'Started using TailwindCSS for layout. Practiced flex and grid.',
-//     created_at: '2025-06-22',
-//   },
-// ];

@@ -29,7 +29,7 @@ import {
   useUpdateReflectionMutation,
 } from '@/store/actions/reflections';
 import { LoaderIcon } from 'react-hot-toast';
-import { currentUser } from '@/utils/data/student';
+import { useLoggedInUser } from '@/hooks/useLoggedInUser';
 
 type Reflection = {
   id: number;
@@ -38,6 +38,7 @@ type Reflection = {
 };
 
 export function StudentReflectionSection() {
+  const { user: currentUser } = useLoggedInUser();
   const { data, isLoading: isLoadingReflections } = useGetAllReflectionsQuery();
   const [reflections, setReflections] = React.useState<Reflection[]>(
     data?.data,
@@ -202,7 +203,7 @@ export function StudentReflectionSection() {
                     Week {reflection.week}
                   </h3>
                   <div className="flex items-center gap-2">
-                    {currentUser.role === 'employer' && (
+                    {currentUser?.role === 'employer' && (
                       <Button
                         size="icon"
                         variant="ghost"

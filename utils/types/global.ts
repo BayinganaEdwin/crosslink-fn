@@ -18,6 +18,7 @@ export type IPagination = {
 };
 
 export type GenericResponse<T> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any;
   status: number;
   message: string;

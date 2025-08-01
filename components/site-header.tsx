@@ -6,11 +6,13 @@ import { ThemeSelector } from './theme-selector';
 import { ModeSwitcher } from './mode-switcher';
 import { NavUser } from './nav-user';
 import { usePathname } from 'next/navigation';
-import { currentUser } from '@/utils/data/student';
+import { useLoggedInUser } from '@/hooks/useLoggedInUser';
 
 export function SiteHeader() {
   const pathname = usePathname();
   const formattedPathname = pathname?.split('/')[1] || '';
+
+  const { user: currentUser } = useLoggedInUser();
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">

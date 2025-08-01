@@ -85,6 +85,7 @@ const rtkQueryErrorLogger: Middleware =
     return next(action);
   };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const middleware = (getDefaultMiddleware: any) =>
   getDefaultMiddleware({
     serializableCheck: {

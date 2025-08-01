@@ -11,6 +11,7 @@ export const userSlice = createSlice({
     logout: (state) => {
       state.user = undefined;
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updateUser: (state, action: PayloadAction<any>) => {
       const { payload } = action;
       state.user = payload;

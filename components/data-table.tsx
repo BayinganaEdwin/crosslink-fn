@@ -97,6 +97,7 @@ import {
   useDeleteGoalMutation,
   useUpdateGoalMutation,
 } from '@/store/actions/goals';
+import { useLoggedInUser } from '@/hooks/useLoggedInUser';
 
 export const schema = z.object({
   id: z.number(),
@@ -174,6 +175,7 @@ export function DataTable({
   const [createGoal, { isLoading: isCreating }] = useCreateGoalMutation();
   const [updateGoal, { isLoading: isUpdating }] = useUpdateGoalMutation();
   const [deleteGoal, { isLoading: isDeleting }] = useDeleteGoalMutation();
+  const { user: currentUser } = useLoggedInUser();
 
   React.useEffect(() => {
     setData(initialData);
@@ -314,42 +316,45 @@ export function DataTable({
     },
     {
       id: 'actions',
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem
-              onClick={() => {
-                setEditGoal(row.original);
-                setEditDrawerOpen(true);
-              }}
-            >
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => handleDeleteGoal(row.original)}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <LoaderIcon className="size-4 animate-spin" />
-              ) : (
-                'Delete'
-              )}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      cell: ({ row }) => {
+        if (currentUser?.role !== 'student') return null;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                size="icon"
+              >
+                <IconDotsVertical />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuItem
+                onClick={() => {
+                  setEditGoal(row.original);
+                  setEditDrawerOpen(true);
+                }}
+              >
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => handleDeleteGoal(row.original)}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <LoaderIcon className="size-4 animate-spin" />
+                ) : (
+                  'Delete'
+                )}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     },
   ];
 
@@ -434,22 +439,24 @@ export function DataTable({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <GoalDrawer
-            mode="create"
-            trigger={
-              <Button variant="outline" size="sm">
-                <IconPlus />
-                <span className="hidden lg:inline">Add Goal</span>
-              </Button>
-            }
-            open={createDrawerOpen}
-            onOpenChange={setCreateDrawerOpen}
-            onSubmit={(goal) => {
-              // Remove id if present (for create)
-              const { id, ...rest } = goal;
-              handleCreateGoal(rest);
-            }}
-          />
+          {currentUser?.role === 'student' && (
+            <GoalDrawer
+              mode="create"
+              trigger={
+                <Button variant="outline" size="sm">
+                  <IconPlus />
+                  <span className="hidden lg:inline">Add Goal</span>
+                </Button>
+              }
+              open={createDrawerOpen}
+              onOpenChange={setCreateDrawerOpen}
+              onSubmit={(goal) => {
+                // Remove id if present (for create)
+                const { id, ...rest } = goal;
+                handleCreateGoal(rest);
+              }}
+            />
+          )}
           {/* Edit drawer, only shown if editGoal is set */}
           <GoalDrawer
             mode="edit"
@@ -636,6 +643,8 @@ export function TableCellViewer({
 }) {
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const { user: currentUser } = useLoggedInUser();
+
   return (
     <Drawer
       direction={isMobile ? 'bottom' : 'right'}
@@ -677,27 +686,32 @@ export function TableCellViewer({
           </div>
         </div>
         <DrawerFooter>
-          {onEdit && (
-            <Button
-              onClick={() => {
-                setDrawerOpen(false);
-                onEdit();
-              }}
-            >
-              Edit
-            </Button>
+          {currentUser?.role === 'student' && (
+            <>
+              {onEdit && (
+                <Button
+                  onClick={() => {
+                    setDrawerOpen(false);
+                    onEdit();
+                  }}
+                >
+                  Edit
+                </Button>
+              )}
+              {onDelete && (
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setDrawerOpen(false);
+                    onDelete();
+                  }}
+                >
+                  Delete
+                </Button>
+              )}
+            </>
           )}
-          {onDelete && (
-            <Button
-              variant="destructive"
-              onClick={() => {
-                setDrawerOpen(false);
-                onDelete();
-              }}
-            >
-              Delete
-            </Button>
-          )}
+
           <DrawerClose asChild>
             <Button variant="outline">Done</Button>
           </DrawerClose>

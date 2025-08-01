@@ -16,35 +16,37 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
-
-const mockEmployers = [
-  {
-    id: 'emp_001',
-    name: 'SINC-TODAY LTD',
-    contact: 'dev@sinc.today',
-    phone: '+250781234567',
-    students: ['Aline Uwase', 'John Mukasa'],
-    feedbackSummary: 'Consistently provides timely and constructive feedback.',
-  },
-  {
-    id: 'emp_002',
-    name: 'Awesomity Labs',
-    contact: 'contact@awesomity.rw',
-    phone: '+250781234567',
-    students: ['Moise Hakizimana'],
-    feedbackSummary: 'Actively supports intern learning goals.',
-  },
-];
+import { useGetAllEmployersQuery } from '@/store/actions/user';
+import { LoaderIcon } from 'react-hot-toast';
 
 export default function SchoolEmployersPage() {
+  const { data, isLoading } = useGetAllEmployersQuery();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [fetchedEmployers, setFetchedEmployers] = React.useState<any[]>(
+    data?.data,
+  );
+  React.useEffect(() => {
+    if (data) setFetchedEmployers(data.data);
+  }, [data]);
+
   const [search, setSearch] = React.useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedEmployer, setSelectedEmployer] = React.useState<any>(null);
   const isMobile = useIsMobile();
 
-  const filteredEmployers = mockEmployers.filter((emp) =>
+  const filteredEmployers = fetchedEmployers?.filter((emp) =>
     emp.name.toLowerCase().includes(search.toLowerCase()),
   );
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <LoaderIcon />
+      </div>
+    );
+  }
+
+  if (!filteredEmployers) return;
 
   return (
     <SidebarProvider
@@ -69,7 +71,7 @@ export default function SchoolEmployersPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {filteredEmployers.map((emp) => (
+            {filteredEmployers?.map((emp) => (
               <Drawer
                 key={emp.id}
                 open={selectedEmployer?.id === emp.id}
@@ -82,7 +84,7 @@ export default function SchoolEmployersPage() {
                       <CardTitle>{emp.name}</CardTitle>
                     </CardHeader>
                     <CardContent className="text-sm text-muted-foreground">
-                      <p>{emp.students.length} student(s)</p>
+                      <p>1 student(s)</p>
                       <p>{emp.contact}</p>
                     </CardContent>
                   </Card>
@@ -106,7 +108,8 @@ export default function SchoolEmployersPage() {
                     <div>
                       <Label>Students</Label>
                       <ul className="list-disc list-inside">
-                        {emp.students.map((student) => (
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        {emp.students?.map((student: any) => (
                           <li key={student}>{student}</li>
                         ))}
                       </ul>

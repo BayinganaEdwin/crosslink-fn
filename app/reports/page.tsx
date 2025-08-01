@@ -18,36 +18,31 @@ import { SiteHeader } from '@/components/site-header';
 const goalReports = [
   {
     week: 'Week 1',
-    completed: 12,
-    pending: 3,
+    completed: 3,
+    pending: 1,
   },
   {
     week: 'Week 2',
-    completed: 15,
+    completed: 2,
     pending: 1,
   },
   {
     week: 'Week 3',
-    completed: 9,
-    pending: 4,
+    completed: 0,
+    pending: 2,
   },
 ];
 
 const feedbackLogs = [
   {
     date: '2025-07-01',
-    student: 'Aline Uwase',
+    student: 'Edwin Bayingana',
     comment: 'Great progress on UI tasks.',
   },
   {
     date: '2025-07-02',
-    student: 'Moise Hakizimana',
+    student: 'Jane Doe',
     comment: 'Needs to improve consistency.',
-  },
-  {
-    date: '2025-07-03',
-    student: 'John Mukasa',
-    comment: 'Excellent technical documentation.',
   },
 ];
 

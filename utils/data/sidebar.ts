@@ -9,7 +9,8 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 
-export const sidebarDataByRole = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const sidebarDataByRole: any = {
   student: {
     navMain: [
       {

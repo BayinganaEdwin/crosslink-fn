@@ -78,11 +78,12 @@ export default function Page() {
       const { user, token } = res;
 
       dispatch(setToken(token));
+      // Sets the cookie to expire in 7 days
+      document.cookie = `${TOKEN_NAME}=${token}; path=/; max-age=${
+        60 * 60 * 24 * 7
+      }`;
       localStorage.setItem(TOKEN_NAME, token);
       localStorage.setItem(USER_DATA, JSON.stringify(user));
-      toast.success('Login successful!', {
-        id: 'global_success_msg',
-      });
       toast.success('Login successful!', {
         id: 'global_success_msg',
       });
@@ -90,20 +91,6 @@ export default function Page() {
     } catch (error) {
       return;
     }
-
-    await login(payload)
-      .unwrap()
-      .then((res) => {
-        const { user, token } = res;
-
-        dispatch(setToken(token));
-        localStorage.setItem(TOKEN_NAME, token);
-        localStorage.setItem(USER_DATA, JSON.stringify(user));
-        toast.success('Login successful!', {
-          id: 'global_success_msg',
-        });
-      })
-      .catch(() => {});
   };
 
   return (
