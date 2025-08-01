@@ -23,35 +23,41 @@ import {
   IconPlus,
 } from '@tabler/icons-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  useCreateReflectionMutation,
+  useGetAllReflectionsQuery,
+  useUpdateReflectionMutation,
+} from '@/store/actions/reflections';
+import { LoaderIcon } from 'react-hot-toast';
+import { currentUser } from '@/utils/data/student';
 
 type Reflection = {
   id: number;
-  week: string;
+  week: number;
   content: string;
 };
 
 export function StudentReflectionSection() {
-  const [reflections, setReflections] = React.useState<Reflection[]>([
-    {
-      id: 1,
-      week: 'Week 1',
-      content: 'Worked on onboarding and read through the codebase.',
-    },
-    {
-      id: 2,
-      week: 'Week 2',
-      content: 'Implemented the login page and connected to backend auth.',
-    },
-  ]);
+  const { data, isLoading: isLoadingReflections } = useGetAllReflectionsQuery();
+  const [reflections, setReflections] = React.useState<Reflection[]>(
+    data?.data,
+  );
+
+  React.useEffect(() => {
+    if (data) setReflections(data?.data);
+  }, [data]);
 
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [expandedId, setExpandedId] = React.useState<number | null>(null);
   const [editingReflection, setEditingReflection] =
     React.useState<Reflection | null>(null);
-  const [form, setForm] = React.useState({ week: '', content: '' });
+  const [form, setForm] = React.useState({ week: 1, content: '' });
+  const [createReflection, { isLoading }] = useCreateReflectionMutation();
+  const [updateReflection, { isLoading: isUpdating }] =
+    useUpdateReflectionMutation();
 
   function openNewReflection() {
-    setForm({ week: '', content: '' });
+    setForm({ week: 1, content: '' });
     setEditingReflection(null);
     setDrawerOpen(true);
   }
@@ -69,9 +75,17 @@ export function StudentReflectionSection() {
     setForm((prev) => ({ ...prev, [id]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingReflection) {
+      const editPayload = {
+        week: Number(editingReflection.week),
+        content: editingReflection.content,
+      };
+      await updateReflection({
+        body: editPayload,
+        reflectionId: editingReflection.id,
+      }).unwrap();
       setReflections((prev) =>
         prev.map((r) =>
           r.id === editingReflection.id ? { ...r, ...form } : r,
@@ -82,10 +96,15 @@ export function StudentReflectionSection() {
         id: Date.now(),
         ...form,
       };
+      const payload = {
+        week: Number(newReflection.week),
+        content: newReflection.content,
+      };
+      await createReflection(payload).unwrap();
       setReflections((prev) => [...prev, newReflection]);
     }
     setDrawerOpen(false);
-  }
+  };
 
   const isMobile = useIsMobile();
 
@@ -123,7 +142,7 @@ export function StudentReflectionSection() {
                   id="week"
                   value={form.week}
                   onChange={handleChange}
-                  placeholder="e.g. Week 3"
+                  placeholder="e.g. 3"
                   required
                 />
               </div>
@@ -138,8 +157,14 @@ export function StudentReflectionSection() {
                 />
               </div>
               <DrawerFooter>
-                <Button type="submit">
-                  {editingReflection ? 'Update' : 'Create'}
+                <Button type="submit" disabled={isLoading || isUpdating}>
+                  {isLoading || isUpdating ? (
+                    <LoaderIcon />
+                  ) : editingReflection ? (
+                    'Update'
+                  ) : (
+                    'Create'
+                  )}
                 </Button>
                 <DrawerClose asChild>
                   <Button variant="outline">Cancel</Button>
@@ -151,13 +176,17 @@ export function StudentReflectionSection() {
       </div>
 
       <div className="flex flex-col gap-4 px-4 lg:px-6">
-        {reflections.length === 0 ? (
+        {isLoadingReflections ? (
+          <div className="flex justify-center">
+            <LoaderIcon className="size-6 animate-spin" />
+          </div>
+        ) : reflections?.length === 0 ? (
           <div className="text-muted-foreground text-sm">
             No reflections added yet.
           </div>
         ) : (
           reflections
-            .slice()
+            ?.slice()
             .reverse()
             .map((reflection) => (
               <Card key={reflection.id} className="p-4">
@@ -169,18 +198,22 @@ export function StudentReflectionSection() {
                     )
                   }
                 >
-                  <h3 className="text-md font-medium">{reflection.week}</h3>
+                  <h3 className="text-md font-medium">
+                    Week {reflection.week}
+                  </h3>
                   <div className="flex items-center gap-2">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openEdit(reflection);
-                      }}
-                    >
-                      <IconEdit className="size-4" />
-                    </Button>
+                    {currentUser.role === 'employer' && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEdit(reflection);
+                        }}
+                      >
+                        <IconEdit className="size-4" />
+                      </Button>
+                    )}
                     {expandedId === reflection.id ? (
                       <IconChevronUp className="size-4" />
                     ) : (

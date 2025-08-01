@@ -1,4 +1,3 @@
-import { LoginPayload } from '@/utils/types/types';
 import { baseAPI } from '../api';
 
 const goalsEndpoints = baseAPI.injectEndpoints({
